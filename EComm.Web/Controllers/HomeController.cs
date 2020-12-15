@@ -2,11 +2,7 @@
 using EComm.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EComm.Web.Controllers
 {
@@ -21,17 +17,21 @@ namespace EComm.Web.Controllers
             _logger = logger;
         }
 
+        [HttpGet("")]
         public IActionResult Index()
         {
             _emailService.SendEmail("robert.wilk@dss.ca.gov", "don't capture dependencies");
             return View();
         }
 
+        [HttpGet("privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [HttpGet("error")]
+        [HttpPost("error")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
