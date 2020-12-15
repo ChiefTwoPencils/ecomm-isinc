@@ -1,3 +1,5 @@
+using EComm.Web.Interfaces;
+using EComm.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,6 +25,8 @@ namespace EComm.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IEmailService, EmailService>();
+            services.AddTransient<IEmailFormatter, ImportantEmailFormatter>();
             services.AddControllersWithViews();
         }
 
