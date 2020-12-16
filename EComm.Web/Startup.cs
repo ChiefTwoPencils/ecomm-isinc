@@ -1,7 +1,11 @@
+using EComm.Data.Interfaces;
+using EComm.EF;
+using EComm.Web.Controllers;
 using EComm.Web.Interfaces;
 using EComm.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +24,10 @@ namespace EComm.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ECommDataContext>(options => options.UseSqlServer(
+                Configuration.GetConnectionString("ECommConnection")));
+            services.AddScoped<IRepository, ECommDataContext>(
+                sp => sp.GetService<ECommDataContext>());
             services.AddSingleton<IEmailService, EmailService>();
             services.AddTransient<IEmailFormatter, ImportantEmailFormatter>();
             services.AddControllersWithViews();
