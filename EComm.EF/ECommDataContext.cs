@@ -19,11 +19,25 @@ namespace EComm.EF
         public DbSet<Product> Products { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
 
-        public async Task<IEnumerable<Product>> GetAllProducts()
-            => await Products.ToListAsync();
+        public async Task<IEnumerable<Product>> GetAllProducts(bool includeSupplier = false)
+        {
+            return includeSupplier switch
+            {
+                true => await Products.Include(p => p.Supplier).ToListAsync(),
+                false => await Products.ToListAsync()
+            };
+        }
 
-        public async Task<Product> GetProduct(int id)
-            => await Products.FindAsync(id);
+        public async Task<Product> GetProduct(int id, bool includeSupplier = false)
+        {
+            return includeSupplier switch
+            {
+                true => await Products
+                    .Include(p => p.Supplier)
+                    .SingleOrDefaultAsync(p => p.Id == id),
+                false => await Products.FindAsync(id)
+            };
+        }
 
         public async Task<Product> GetProductRaw(int id)
             => await Products

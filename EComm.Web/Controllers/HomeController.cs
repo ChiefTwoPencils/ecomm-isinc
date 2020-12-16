@@ -26,8 +26,8 @@ namespace EComm.Web.Controllers
         public async Task<IActionResult> Index()
         {
             _emailService.SendEmail("robert.wilk@dss.ca.gov", "don't capture dependencies");
-            var products = await _repo.GetAllProducts();
-            return Json(products);
+            var products = await _repo.GetAllProducts(true);
+            return View(products);
         }
 
         [HttpGet("privacy")]

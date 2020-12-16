@@ -8,7 +8,7 @@ namespace EComm.Data.Interfaces
 {
     public interface IRepository
     {
-        Task<IEnumerable<Product>> GetAllProducts();
-        Task<Product> GetProduct(int id);
+        Task<IEnumerable<Product>> GetAllProducts(bool includeSupplier = false);
+        Task<Product> GetProduct(int id, bool includeSupplier = false);
     }
 }
