@@ -62,5 +62,15 @@ namespace EComm.Web.Controllers
             model.Suppliers = await _repo.GetAllSuppliers();
             return View(model);
         }
+
+        [HttpPost("addtocart")]
+        public async Task<IActionResult> AddToCart(int id, int quantity)
+        {
+            var product = await _repo.GetProduct(id);
+            var totalCost = product.UnitPrice * quantity;
+            var msg = $"You added {quantity} {product.ProductName}(s) "
+                + $"to your cart for a total cost of {totalCost:C}.";
+            return PartialView("_AddedToCart", msg);
+        }
     } 
 }

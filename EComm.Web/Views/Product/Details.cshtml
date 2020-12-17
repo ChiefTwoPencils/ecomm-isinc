@@ -43,7 +43,16 @@
         </dd>
     </dl>
 </div>
+<br />
+<form id="addToCartForm" asp-controller="Product" asp-action="AddToCart" asp-route-id="@Model.Id">
+    <input name="quantity" size="3" />
+    <input type="submit" value="Add to Cart" />
+</form>
+<div id="message"></div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     <a asp-controller="Home" asp-action="Index">Back to List</a>
 </div>
+@section scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+}
