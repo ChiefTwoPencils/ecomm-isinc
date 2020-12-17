@@ -39,9 +39,21 @@ namespace EComm.EF
             };
         }
 
+        public async Task<Product> UpdateProduct(Product product)
+        {
+            Products.Update(product);
+            Entry(product).State = EntityState.Modified;
+            await SaveChangesAsync();
+            return product;
+        }
+
         public async Task<Product> GetProductRaw(int id)
             => await Products
                 .FromSqlRaw("select * from Products where Id = {0}", id)    
                 .SingleOrDefaultAsync();
+
+        public async Task<IEnumerable<Supplier>> GetAllSuppliers()
+            => await Suppliers.ToListAsync();
+        
     }
 }
