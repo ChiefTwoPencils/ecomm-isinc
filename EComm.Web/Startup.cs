@@ -24,6 +24,8 @@ namespace EComm.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+            services.AddSession();
             services.AddDbContext<ECommDataContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("ECommConnection")));
             services.AddScoped<IRepository, ECommDataContext>(
@@ -46,13 +48,14 @@ namespace EComm.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseStatusCodePagesWithReExecute("/clienterror", "?statuscode={0}");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseSession();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }

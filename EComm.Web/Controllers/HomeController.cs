@@ -35,5 +35,19 @@ namespace EComm.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpGet("clienterror")]
+        [HttpPost("clienterror")]
+        public IActionResult ClientError(int statusCode)
+        {
+            ViewBag.Message = statusCode switch
+            {
+                400 => "Bad Request (400)",
+                404 => "Not Found (404)",
+                418 => "I'm a teapot (418)",
+                _ => $"Unchecked error ({statusCode})"
+            };
+            return View();
+        }
     }
 }

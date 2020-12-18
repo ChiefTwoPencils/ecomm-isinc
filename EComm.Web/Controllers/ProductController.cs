@@ -20,7 +20,11 @@ namespace EComm.Web.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Details(int id)
         {
-            var product = await _repo.GetProduct(id, true);
+            var product = await _repo.GetProduct(id, true);            
+            if (product == null)
+            {
+                return NotFound();
+            }
             return View(product);
         }
 
@@ -28,6 +32,10 @@ namespace EComm.Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _repo.GetProduct(id, true);
+            if (product == null)
+            {
+                return BadRequest();
+            }
             var model = new ProductEditViewModel
             {
                 Id = product.Id,
@@ -67,10 +75,48 @@ namespace EComm.Web.Controllers
         public async Task<IActionResult> AddToCart(int id, int quantity)
         {
             var product = await _repo.GetProduct(id);
+            if (product == null || quantity < 1)
+            {
+                return BadRequest();
+            }
             var totalCost = product.UnitPrice * quantity;
             var msg = $"You added {quantity} {product.ProductName}(s) "
                 + $"to your cart for a total cost of {totalCost:C}.";
+
+            var cart = ShoppingCart.GetFromSession(HttpContext.Session);
+            var lineItem = cart.LineItems.SingleOrDefault(i => i.Product.Id == id);
+            if (lineItem == null)
+            {
+                cart.LineItems.Add(new ShoppingCart.LineItem
+                {
+                    Product = product,
+                    Quantity = quantity
+                });
+            }
+            else
+            {
+                lineItem.Quantity += quantity;
+            }
+            ShoppingCart.StoreInSession(cart, HttpContext.Session);
             return PartialView("_AddedToCart", msg);
+        }
+
+        public IActionResult Cart()
+        {
+            var cart = ShoppingCart.GetFromSession(HttpContext.Session);
+            return View(new CartViewModel { Cart = cart });
+        }
+
+        [HttpPost("checkout")]
+        public IActionResult Checkout(CartViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                HttpContext.Session.Clear();
+                return View("ThankYou");
+            }
+            model.Cart = ShoppingCart.GetFromSession(HttpContext.Session);
+            return View("Cart", model);
         }
     } 
 }
