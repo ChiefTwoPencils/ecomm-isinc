@@ -20,7 +20,7 @@ namespace EComm.Tests
         {
             // Arrange
             var repo = new StubRepository();
-            var pc = new ProductController(repo);
+            var pc = new ProductController(repo, null);
 
             // Act
             var result = await pc.Details(1);
