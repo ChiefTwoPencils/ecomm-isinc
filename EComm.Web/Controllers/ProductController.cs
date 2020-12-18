@@ -1,6 +1,7 @@
 ﻿using EComm.Data.Entities;
 using EComm.Data.Interfaces;
 using EComm.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace EComm.Web.Controllers
         }
 
         [HttpGet("edit/{id}")]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _repo.GetProduct(id, true);
@@ -51,6 +53,7 @@ namespace EComm.Web.Controllers
         }
 
         [HttpPost("edit/{id}")]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<IActionResult> Edit(int id, ProductEditViewModel model)
         {
             if (ModelState.IsValid)

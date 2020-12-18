@@ -13,4 +13,8 @@
     <ProjectReference Include="..\EComm.EF\EComm.EF.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Policies\" />
+  </ItemGroup>
+
 </Project>

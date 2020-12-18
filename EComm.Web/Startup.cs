@@ -3,12 +3,14 @@ using EComm.EF;
 using EComm.Web.Controllers;
 using EComm.Web.Interfaces;
 using EComm.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Security.Claims;
 
 namespace EComm.Web
 {
@@ -26,6 +28,15 @@ namespace EComm.Web
         {
             services.AddMemoryCache();
             services.AddSession();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => { options.LoginPath = "/login"; });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminsOnly", policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, "Admin");
+                });
+            });
             services.AddDbContext<ECommDataContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("ECommConnection")));
             services.AddScoped<IRepository, ECommDataContext>(
@@ -54,7 +65,9 @@ namespace EComm.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseSession();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
