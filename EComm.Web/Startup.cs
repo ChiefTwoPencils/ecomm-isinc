@@ -2,8 +2,10 @@ using EComm.Data.Interfaces;
 using EComm.EF;
 using EComm.Web.Controllers;
 using EComm.Web.Interfaces;
+using EComm.Web.Policies;
 using EComm.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +38,16 @@ namespace EComm.Web
                 {
                     policy.RequireClaim(ClaimTypes.Role, "Admin");
                 });
+
+                options.AddPolicy("LessThan100", policy =>
+                {
+                    policy.AddRequirements(new ProductLessThanOneHundredRequirement());
+                });
+
+                options.AddPolicy("LessThan", policy =>
+                {
+                    policy.AddRequirements(new ProductLessThanRequirement(25.00m));
+                });
             });
             services.AddDbContext<ECommDataContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("ECommConnection")));
@@ -43,6 +55,8 @@ namespace EComm.Web
                 sp => sp.GetService<ECommDataContext>());
             services.AddSingleton<IEmailService, EmailService>();
             services.AddTransient<IEmailFormatter, ImportantEmailFormatter>();
+            services.AddScoped<IAuthorizationHandler, ProductLessThanOneHundredHandler>();
+            services.AddScoped<IAuthorizationHandler, ProductLessThanHandler>();
             services.AddControllersWithViews();
         }
 

@@ -14,9 +14,13 @@ namespace EComm.Web.Controllers
     public class ProductController : Controller
     {
         private readonly IRepository _repo;
+        private readonly IAuthorizationService _auth;
 
-        public ProductController(IRepository repo)
-            => _repo = repo;
+        public ProductController(IRepository repo, IAuthorizationService auth)
+        {
+            _repo = repo;
+            _auth = auth;
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Details(int id)
@@ -54,10 +58,17 @@ namespace EComm.Web.Controllers
 
         [HttpPost("edit/{id}")]
         [Authorize(Policy = "AdminsOnly")]
+        [Authorize(Policy = "LessThan100")]
         public async Task<IActionResult> Edit(int id, ProductEditViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var original = await _repo.GetProduct(id);
+                var authed = await _auth.AuthorizeAsync(User, original, "LessThan");
+                if (!authed.Succeeded)
+                {
+                    return new ForbidResult();
+                }
                 var product = new Product
                 {
                     Id = id,
@@ -67,6 +78,7 @@ namespace EComm.Web.Controllers
                     IsDiscontinued = model.IsDiscontinued,
                     SupplierId = model.SupplierId
                 };
+                
                 await _repo.UpdateProduct(product);
                 return RedirectToAction("Details", new { id });
             }
